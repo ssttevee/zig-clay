@@ -1,0 +1,21 @@
+.{
+    .name = "clay",
+    .version = "0.13.0",
+    .minimum_zig_version = "0.13.0",
+    .dependencies = .{
+        .clay = .{
+            .url = "https://github.com/nicbarker/clay/archive/refs/tags/v0.13.tar.gz",
+            .hash = "1220211ff0505143a8c4768a5b85c06e25661a51893b6b00a41493f82cab6d710043",
+        },
+        .raylib = .{
+            .url = "git+https://github.com/Not-Nik/raylib-zig.git#1ef4995f82686fda7c2eff1c76f26d1200d74760",
+            .hash = "12206cf18aea41dc1e61b697c36ef627752e84fe9a9362b800240fce7dea3665094d",
+            .optional = true,
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
