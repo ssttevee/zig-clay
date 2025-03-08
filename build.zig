@@ -5,9 +5,11 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     const enable_renderer_raylib = b.option(bool, "enable_renderer_raylib", "Enable the raylib renderer") orelse true;
+    const enable_renderer_cairo = b.option(bool, "enable_renderer_cairo", "Enable the cairo renderer") orelse false;
 
     const options = b.addOptions();
     options.addOption(bool, "enable_renderer_raylib", enable_renderer_raylib);
+    options.addOption(bool, "enable_renderer_cairo", enable_renderer_cairo);
 
     const clay = b.dependency("clay", .{});
 
@@ -83,6 +85,53 @@ pub fn build(b: *std.Build) void {
                     example_raylib_sidebar_scrolling_container,
                     .{
                         .dest_sub_path = "examples/raylib-sidebar-scrolling-container",
+                    },
+                ).step,
+            );
+        }
+    }
+
+    if (enable_renderer_cairo) {
+        if (b.lazyDependency("cairo", .{
+            .target = target,
+            .optimize = optimize,
+        })) |cairo| {
+            const cairo_module = cairo.module("cairo");
+            const cairo_renderer_module = b.addModule("clay-renderer-cairo", .{
+                .target = target,
+                .optimize = optimize,
+                .root_source_file = b.path("src/renderers/cairo.zig"),
+            });
+            cairo_renderer_module.addCSourceFile(.{
+                .file = b.addWriteFiles().add("cairo-renderer.c",
+                    \\#include "clay.h"
+                    \\#include "renderers/cairo/clay_renderer_cairo.c"
+                    \\Clay_Dimensions Clay_Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData) {
+                    \\    return Raylib_MeasureText(text, config, userData);
+                    \\};
+                ),
+            });
+            cairo_renderer_module.addIncludePath(clay.path(""));
+            cairo_renderer_module.addImport("clay", clay_module);
+            cairo_renderer_module.addImport("cairo", cairo_module);
+            clay_module.addImport("clay-renderer-cairo", cairo_renderer_module);
+            lib_unit_tests.root_module.addImport("clay-renderer-cairo", cairo_module);
+            lib_unit_tests.root_module.addImport("cairo", cairo_module);
+
+            const example_cairo_pdf_rendering = b.addExecutable(.{
+                .target = target,
+                .optimize = optimize,
+                .name = "cairo-pdf-rendering",
+                .root_source_file = b.path("examples/cairo-pdf-rendering/main.zig"),
+            });
+
+            example_cairo_pdf_rendering.root_module.addImport("clay", clay_module);
+
+            b.getInstallStep().dependOn(
+                &b.addInstallArtifact(
+                    example_cairo_pdf_rendering,
+                    .{
+                        .dest_sub_path = "examples/cairo-pdf-rendering",
                     },
                 ).step,
             );
