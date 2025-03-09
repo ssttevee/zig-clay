@@ -45,7 +45,7 @@ test String {
     try std.testing.expectEqualStrings("asdf", String.fromSlice("asdf").asSlice());
 }
 
-pub const Context = extern opaque {
+pub const Context = opaque {
     pub fn init(allocator: std.mem.Allocator, layout_dimensions: Dimensions, error_handler: @import("errors.zig").ErrorHandler) !*Context {
         const arena = try Arena.initMin(allocator);
         errdefer arena.deinit(allocator);
@@ -202,6 +202,8 @@ pub const ElementId = extern struct {
     base_id: u32 = 0,
     /// The string id to hash.
     string_id: String = .{ .len = 0, .ptr = undefined },
+
+    pub usingnamespace @import("id.zig");
 };
 
 /// Controls the "radius", or corner rounding of elements, including rectangles, borders and images.
@@ -259,7 +261,112 @@ pub const ChildAlignment = extern struct {
     y: LayoutAlignmentY = .top,
 };
 
-pub const Sizing = @import("Sizing.zig");
+/// Controls the sizing of this element inside its parent container.
+pub const Sizing = extern struct {
+    /// Controls how the element takes up space inside its parent container.
+    pub const Type = enum(u8) {
+        /// (default) Wraps tightly to the size of the element's contents.
+        fit,
+
+        /// Expands along this axis to fill available space in the parent element, sharing it with other GROW elements.
+        grow,
+
+        /// Expects 0-1 range. Clamps the axis size to a percent of the parent container's axis size minus padding and child gaps.
+        percent,
+
+        /// Clamps the axis size to an exact size in pixels.
+        fixed,
+
+        pub const default: Type = .fit;
+    };
+
+    /// Controls the minimum and maximum size in pixels that this element is allowed to grow or shrink to,
+    /// overriding sizing types such as FIT or GROW.
+    pub const MinMax = extern struct {
+        /// The smallest final size of the element on this axis will be this value in pixels.
+        min: f32 = 0,
+
+        /// The largest final size of the element on this axis will be this value in pixels.
+        max: f32 = std.math.floatMax(f32),
+    };
+
+    /// Controls how the element takes up space inside its parent container.
+    pub const Axis = extern struct {
+        size: extern union {
+            min_max: MinMax,
+            percent: f32,
+        },
+        type: Type,
+
+        pub fn fit(min_max: MinMax) Axis {
+            return .{
+                .type = .fit,
+                .size = .{
+                    .min_max = min_max,
+                },
+            };
+        }
+
+        pub fn grow(min_max: MinMax) Axis {
+            return .{
+                .type = .grow,
+                .size = .{
+                    .min_max = min_max,
+                },
+            };
+        }
+
+        pub fn percent(pct: f32) Axis {
+            return .{
+                .type = .percent,
+                .size = .{
+                    .percent = pct,
+                },
+            };
+        }
+
+        pub fn fixed(value: f32) Axis {
+            return .{
+                .type = .fixed,
+                .size = .{
+                    .min_max = .{
+                        .min = value,
+                        .max = value,
+                    },
+                },
+            };
+        }
+
+        pub const default: Axis = .fit(.{});
+    };
+
+    /// Controls the width sizing of the element, along the x axis.
+    width: Axis = .default,
+
+    /// Controls the height sizing of the element, along the y axis.
+    height: Axis = .default,
+
+    fn both(axis: Axis) Sizing {
+        return .{ .width = axis, .height = axis };
+    }
+
+    pub fn fit(min_max: MinMax) Sizing {
+        return both(.fit(min_max));
+    }
+
+    pub fn grow(min_max: MinMax) Sizing {
+        return both(.grow(min_max));
+    }
+
+    pub fn fixed(size: f32) Sizing {
+        return both(.fixed(size));
+    }
+
+    /// Range between 0 - 1
+    pub fn percent(pct: f32) Sizing {
+        return both(.percent(pct));
+    }
+};
 
 /// Controls "padding" in pixels, which is a gap between the bounding box of this element and where its children
 /// will be placed.
@@ -290,7 +397,7 @@ pub const Padding = extern struct {
 
 /// Controls various settings that affect the size and position of an element, as well as the sizes and positions
 /// of any child elements.
-pub const LayoutConfig = struct {
+pub const LayoutConfig = extern struct {
     /// Controls the sizing of this element inside it's parent container, including FIT, GROW, PERCENT and FIXED sizing.
     sizing: Sizing = .{},
     /// Controls "padding" in pixels, which is a gap between the bounding box of this element and where its children will be placed.
@@ -777,7 +884,7 @@ pub const PointerData = extern struct {
     state: PointerDataInteractionState,
 };
 
-pub const ElementDeclaration = struct {
+pub const ElementDeclaration = extern struct {
     /// Primarily created via the CLAY_ID(), CLAY_IDI(), CLAY_ID_LOCAL() and CLAY_IDI_LOCAL() macros.
     /// Represents a hashed string ID used for identifying and finding specific clay UI elements, required by functions such as Clay_PointerOver() and Clay_GetElementData().
     id: ElementId = .{},
@@ -821,7 +928,7 @@ pub const endLayout = cdef.Clay_EndLayout;
 
 pub inline fn ui(config: ElementDeclaration) fn (void) callconv(.Inline) void {
     cdef.internal.Clay__OpenElement();
-    cdef.internal.Clay__ConfigureOpenElement(cdef.ElementDeclaration.fromZig(config));
+    cdef.internal.Clay__ConfigureOpenElement(config);
     return elementBody;
 }
 

@@ -1,82 +1,6 @@
 const std = @import("std");
 const clay = @import("root.zig");
 
-pub const Sizing = extern struct {
-    pub const Axis = extern struct {
-        size: extern union {
-            min_max: clay.Sizing.MinMax,
-            percent: f32,
-        },
-        type: clay.Sizing.Type,
-
-        pub fn fromZig(zig: clay.Sizing.Axis) Axis {
-            return .{
-                .type = std.meta.activeTag(zig),
-                .size = switch (zig) {
-                    inline .fit, .grow, .fixed => |min_max| .{ .min_max = min_max },
-                    .percent => |percent| .{ .percent = percent },
-                },
-            };
-        }
-    };
-
-    width: Axis = Axis.fromZig(clay.Sizing.Axis.default),
-    height: Axis = Axis.fromZig(clay.Sizing.Axis.default),
-
-    pub fn fromZig(zig: clay.Sizing) Sizing {
-        return .{
-            .width = Axis.fromZig(zig.width),
-            .height = Axis.fromZig(zig.height),
-        };
-    }
-};
-
-pub const LayoutConfig = extern struct {
-    sizing: Sizing = .{},
-    padding: clay.Padding = .{},
-    child_gap: u16 = 0,
-    child_alignment: clay.ChildAlignment = .{},
-    layout_direction: clay.LayoutDirection = .left_to_right,
-
-    pub fn fromZig(zig: clay.LayoutConfig) LayoutConfig {
-        return .{
-            .sizing = Sizing.fromZig(zig.sizing),
-            .padding = zig.padding,
-            .child_gap = zig.child_gap,
-            .child_alignment = zig.child_alignment,
-            .layout_direction = zig.layout_direction,
-        };
-    }
-};
-
-pub const ElementDeclaration = extern struct {
-    id: clay.ElementId,
-    layout: LayoutConfig,
-    background_color: clay.Color,
-    corner_radius: clay.CornerRadius,
-    image: clay.ImageElementConfig,
-    floating: clay.FloatingElementConfig,
-    custom: clay.CustomElementConfig,
-    scroll: clay.ScrollElementConfig,
-    border: clay.BorderElementConfig,
-    user_data: ?*anyopaque,
-
-    pub fn fromZig(zig: clay.ElementDeclaration) ElementDeclaration {
-        return .{
-            .id = zig.id,
-            .layout = LayoutConfig.fromZig(zig.layout),
-            .background_color = zig.background_color,
-            .corner_radius = zig.corner_radius,
-            .image = zig.image,
-            .floating = zig.floating,
-            .custom = zig.custom,
-            .scroll = zig.scroll,
-            .border = zig.border,
-            .user_data = zig.user_data,
-        };
-    }
-};
-
 pub const RenderCommand = extern struct {
     bounding_box: clay.BoundingBox,
     render_data: extern union {
@@ -218,7 +142,7 @@ pub extern fn Clay_ResetMeasureTextCache() void;
 
 pub const internal = struct {
     pub extern fn Clay__OpenElement() void;
-    pub extern fn Clay__ConfigureOpenElement(config: ElementDeclaration) void;
+    pub extern fn Clay__ConfigureOpenElement(config: clay.ElementDeclaration) void;
     pub extern fn Clay__CloseElement() void;
     pub extern fn Clay__HashString(key: clay.String, offset: u32, seed: u32) clay.ElementId;
     pub extern fn Clay__OpenTextElement(text: clay.String, text_config: clay.TextElementConfig) void;

@@ -1,16 +1,17 @@
 .{
-    .name = "clay",
+    .name = .clay,
+    .fingerprint = 0x1c2526cbfa4b616c,
     .version = "0.13.0",
-    .minimum_zig_version = "0.13.0",
+    .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .clay = .{
-            .url = "https://github.com/nicbarker/clay/archive/refs/tags/v0.13.tar.gz",
-            .hash = "1220211ff0505143a8c4768a5b85c06e25661a51893b6b00a41493f82cab6d710043",
+            .url = "git+https://github.com/nicbarker/clay.git#v0.13",
+            .hash = "N-V-__8AAO23UQAhH_BQUUOoxHaKW4XAbiVmGlGJO2sApBST",
         },
         .raylib = .{
-            .url = "git+https://github.com/Not-Nik/raylib-zig.git#1ef4995f82686fda7c2eff1c76f26d1200d74760",
-            .hash = "12206cf18aea41dc1e61b697c36ef627752e84fe9a9362b800240fce7dea3665094d",
-            .optional = true,
+            .url = "git+https://github.com/Not-Nik/raylib-zig.git#5d7c3e4171b3a4ea03d9a8cf18ee65fb65b03c9f",
+            .hash = "raylib_zig-5.6.0-dev-KE8REE0uBQCID3vVj1M9FUQwBSdO-KBnypo8g5LQXP8E",
+            .lazy = true,
         },
     },
     .paths = .{
