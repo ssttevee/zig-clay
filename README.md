@@ -13,7 +13,7 @@ All symbols prefixed with `clay.` are optimized for zig-idiomaticity, but may no
 Run this command from your project folder
 
 ```sh
-zig fetch --save git+https://github.com/nicbarker/clay.git#{commit hash to pin version}
+zig fetch --save git+https://github.com/ssttevee/zig-clay.git#{optional commit hash to pin version}
 ```
 
 Then add this snippet to your build.zig file
