@@ -945,6 +945,44 @@ pub const beginLayout = cdef.Clay_BeginLayout;
 
 pub const endLayout = cdef.Clay_EndLayout;
 
+/// Opens a generic empty container, that is configurable and supports nested children.
+///
+/// ```
+/// // Define an element with 16px of x and y padding
+/// clay.ui()(.{
+///     .id = clay.id("Outer"),
+///     .layout = .{
+///         .padding = .all(16),
+///     },
+/// })({
+///     // A nested child element
+///     clay.ui()(.{
+///         .id = clay.id("SideBar"),
+///         .layout = .{
+///             .layout_direction = .top_to_bottom,
+///             .child_gap = 16,
+///         },
+///     })({
+///         // Children laid out top to bottom with a 16 px gap between them
+///     });
+///
+///     // A vertical scrolling container with a colored background
+///     CLAY({
+///         .layout = {
+///             .layout_direction = .top_to_bottom,
+///             .child_gap = 16,
+///         },
+///         .background_color = .rgb(200, 200, 100),
+///         .corner_radius = .all(10),
+///         .scroll = {
+///             .vertical = true,
+///         },
+///     })({
+///         // child elements
+///     });
+/// });
+/// ```
+///
 /// this needs to be a separate step from `elementConfig` or else `clay.isHovered()` does not work in the config declaration.
 pub inline fn ui() @TypeOf(elementConfig) {
     cdef.internal.Clay__OpenElement();
