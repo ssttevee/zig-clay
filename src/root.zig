@@ -817,7 +817,7 @@ fn testRenderCommandArrayToZigErrored(expect_error: bool) !void {
     defer ctx.deinit(std.testing.allocator);
 
     const cmds = layout()({
-        ui(.{
+        ui()(.{
             .border = .{
                 .width = BorderWidth.all(1),
                 .color = Color.black,
@@ -945,8 +945,13 @@ pub const beginLayout = cdef.Clay_BeginLayout;
 
 pub const endLayout = cdef.Clay_EndLayout;
 
-pub inline fn ui(config: ElementDeclaration) fn (void) callconv(.Inline) void {
+/// this needs to be a separate step from `elementConfig` or else `clay.isHovered()` does not work in the config declaration.
+pub inline fn ui() @TypeOf(elementConfig) {
     cdef.internal.Clay__OpenElement();
+    return elementConfig;
+}
+
+inline fn elementConfig(config: ElementDeclaration) @TypeOf(elementBody) {
     cdef.internal.Clay__ConfigureOpenElement(config);
     return elementBody;
 }
