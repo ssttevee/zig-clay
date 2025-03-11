@@ -58,14 +58,14 @@ fn createLayout() clay.RenderCommandArray {
     return clay.layout()({
         clay.ui(.{ .id = .id("OuterContainer"), .layout = .{ .sizing = .grow(.{}), .padding = .all(16), .child_gap = 16 }, .background_color = .rgb(200, 200, 200) })({
             clay.ui(.{ .id = .id("SideBar"), .layout = .{ .layout_direction = .top_to_bottom, .sizing = .{ .width = .fixed(300), .height = .grow(.{}) }, .padding = .all(16), .child_gap = 16 }, .background_color = .rgb(150, 150, 255) })({
-                clay.ui(.{ .id = .id("ProfilePictureOuter"), .layout = .{ .sizing = .{ .width = .grow(.{}) }, .padding = .all(8), .child_gap = 8, .child_alignment = .{ .y = .center } }, .background_color = .rgb(130, 130, 255) })({
+                clay.ui(.{ .id = .id("ProfilePictureOuter"), .layout = .{ .sizing = .{ .width = .grow(.{}) }, .padding = .all(8), .child_gap = 8, .child_alignment = .center_left }, .background_color = .rgb(130, 130, 255) })({
                     clay.ui(.{ .id = .id("ProfilePicture"), .layout = .{ .sizing = .fixed(60) }, .image = .{ .image_data = &profile_picture, .source_dimensions = .{ .width = 60, .height = 60 } } })({});
                     clay.text(profile_text, .{ .font_size = 24, .text_color = .black, .text_alignment = .right });
                 });
             });
 
             clay.ui(.{ .id = .id("RightPanel"), .layout = .{ .layout_direction = .top_to_bottom, .sizing = .{ .width = .grow(.{}), .height = .grow(.{}) }, .child_gap = 16 } })({
-                clay.ui(.{ .layout = .{ .sizing = .{ .width = .grow(.{}) }, .child_alignment = .{ .x = .right }, .padding = .all(8), .child_gap = 8 }, .background_color = .rgb(180, 180, 180) })({
+                clay.ui(.{ .layout = .{ .sizing = .{ .width = .grow(.{}) }, .child_alignment = .top_right, .padding = .all(8), .child_gap = 8 }, .background_color = .rgb(180, 180, 180) })({
                     renderHeaderButton("Header Item 1");
                     renderHeaderButton("Header Item 2");
                     renderHeaderButton("Header Item 3");
@@ -98,9 +98,9 @@ fn createLayout() clay.RenderCommandArray {
 
                     clay.text("Suspendisse in est ante in nibh. Amet venenatis urna cursus eget nunc scelerisque viverra. Elementum sagittis vitae et leo duis ut diam quam nulla. Enim nulla aliquet porttitor lacus. Pellentesque habitant morbi tristique senectus et. Facilisi nullam vehicula ipsum a arcu cursus vitae.\nSem fringilla ut morbi tincidunt. Euismod quis viverra nibh cras pulvinar mattis nunc sed. Velit sed ullamcorper morbi tincidunt ornare massa. Varius quam quisque id diam vel quam. Nulla pellentesque dignissim enim sit amet venenatis. Enim lobortis scelerisque fermentum dui faucibus in. Pretium viverra suspendisse potenti nullam ac tortor vitae. Lectus vestibulum mattis ullamcorper velit sed. Eget mauris pharetra et ultrices neque ornare aenean euismod elementum. Habitant morbi tristique senectus et. Integer vitae justo eget magna fermentum iaculis eu. Semper quis lectus nulla at volutpat diam. Enim praesent elementum facilisis leo. Massa vitae tortor condimentum lacinia quis vel.", .{ .font_size = 24, .text_color = .black });
 
-                    clay.ui(.{ .id = .id("Photos"), .layout = .{ .sizing = .{ .width = .grow(.{}) }, .child_alignment = .{ .x = .center, .y = .center }, .child_gap = 16, .padding = .all(16) }, .background_color = .rgb(180, 180, 220) })({
+                    clay.ui(.{ .id = .id("Photos"), .layout = .{ .sizing = .{ .width = .grow(.{}) }, .child_alignment = .center, .child_gap = 16, .padding = .all(16) }, .background_color = .rgb(180, 180, 220) })({
                         clay.ui(.{ .id = .id("Picture2"), .layout = .{ .sizing = .{ .width = .fixed(120), .height = .fixed(120) } }, .image = .{ .image_data = &profile_picture, .source_dimensions = .{ .width = 120, .height = 120 } } })({});
-                        clay.ui(.{ .id = .id("Picture1"), .layout = .{ .child_alignment = .{ .x = .center }, .layout_direction = .top_to_bottom, .padding = .all(8) }, .background_color = .rgb(170, 170, 220) })({
+                        clay.ui(.{ .id = .id("Picture1"), .layout = .{ .child_alignment = .top_center, .layout_direction = .top_to_bottom, .padding = .all(8) }, .background_color = .rgb(170, 170, 220) })({
                             clay.ui(.{ .id = .id("ProfilePicture2"), .layout = .{ .sizing = .{ .width = .fixed(60), .height = .fixed(60) } }, .image = .{ .image_data = &profile_picture, .source_dimensions = .{ .width = 60, .height = 60 } } })({});
                             clay.text("Image caption below", .{ .font_size = 24, .text_color = .black });
                         });
