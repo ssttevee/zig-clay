@@ -998,7 +998,7 @@ inline fn elementBody(_: void) void {
     cdef.internal.Clay__CloseElement();
 }
 
-pub fn text(s: []const u8, config: TextElementConfig) void {
+pub fn text(s: []const u8, config: *const TextElementConfig) void {
     cdef.internal.Clay__OpenTextElement(String.fromSlice(s), config);
 }
 

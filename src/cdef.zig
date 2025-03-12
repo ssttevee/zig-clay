@@ -145,7 +145,7 @@ pub const internal = struct {
     pub extern fn Clay__ConfigureOpenElement(config: clay.ElementDeclaration) void;
     pub extern fn Clay__CloseElement() void;
     pub extern fn Clay__HashString(key: clay.String, offset: u32, seed: u32) clay.ElementId;
-    pub extern fn Clay__OpenTextElement(text: clay.String, text_config: clay.TextElementConfig) void;
+    pub extern fn Clay__OpenTextElement(text: clay.String, text_config: *const clay.TextElementConfig) void;
     pub extern fn Clay__StoreTextElementConfig(config: clay.TextElementConfig) *clay.TextElementConfig;
     pub extern fn Clay__GetParentElementId() u32;
 };
