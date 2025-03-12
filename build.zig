@@ -11,11 +11,6 @@ pub fn build(b: *std.Build) void {
 
     const clay = b.dependency("clay", .{});
 
-    const clay_impl_c = b.addWriteFiles().add("clay.c",
-        \\#define CLAY_IMPLEMENTATION
-        \\#include<clay.h>
-    );
-
     const clay_module = b.addModule("clay", .{
         .target = target,
         .optimize = optimize,
@@ -23,18 +18,14 @@ pub fn build(b: *std.Build) void {
     });
 
     clay_module.addOptions("options", options);
-    clay_module.addIncludePath(clay.path(""));
-    clay_module.addCSourceFile(.{ .file = clay_impl_c });
+    clay_module.addCMacro("CLAY_IMPLEMENTATION", "");
+    clay_module.addCSourceFile(.{ .file = b.addWriteFiles().addCopyFile(clay.path("clay.h"), "clay.c") });
 
     const lib_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
+        .root_module = clay_module,
     });
-
-    lib_unit_tests.root_module.addOptions("options", options);
-    lib_unit_tests.addIncludePath(clay.path(""));
-    lib_unit_tests.addCSourceFile(.{ .file = clay_impl_c });
 
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
 
@@ -66,8 +57,6 @@ pub fn build(b: *std.Build) void {
             raylib_renderer_module.addImport("raylib", raylib_module);
             raylib_renderer_module.linkLibrary(raylib.artifact("raylib"));
             clay_module.addImport("clay-renderer-raylib", raylib_renderer_module);
-            lib_unit_tests.root_module.addImport("clay-renderer-raylib", raylib_module);
-            lib_unit_tests.root_module.addImport("raylib", raylib_module);
 
             const example_raylib_sidebar_scrolling_container = b.addExecutable(.{
                 .target = target,
