@@ -768,7 +768,7 @@ pub const RenderCommandArray = extern struct {
     ptr: [*]cdef.RenderCommand,
 
     pub fn asSlice(self: RenderCommandArray) []cdef.RenderCommand {
-        return self.internalArray[0..@intCast(self.len)];
+        return self.ptr[0..@intCast(self.len)];
     }
 
     /// WARNING: this function destructively overwrites the underlying memory, invalidating the `RenderCommandArray`
