@@ -102,7 +102,6 @@ pub const ElementData = extern struct {
     pub fn toZig(self: ElementData) clay.ElementData {
         return .{
             .bounding_box = self.bounding_box,
-            .config = self.config,
         };
     }
 };
