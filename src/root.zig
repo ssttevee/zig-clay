@@ -159,6 +159,10 @@ pub const Color = extern struct {
 
     pub const black: Color = rgb(0, 0, 0);
     pub const white: Color = rgb(255, 255, 255);
+    pub const red: Color = rgb(255, 0, 0);
+    pub const green: Color = rgb(0, 255, 0);
+    pub const blue: Color = rgb(0, 0, 255);
+    pub const transparent: Color = .{};
 
     pub inline fn rgb(r: f32, g: f32, b: f32) Color {
         return rgba(r, g, b, 255);
