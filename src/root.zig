@@ -176,6 +176,15 @@ pub const Color = extern struct {
             .a = a,
         };
     }
+
+    pub inline fn withAlpha(color: Color, a: f32) Color {
+        return .{
+            .r = color.r,
+            .g = color.g,
+            .b = color.b,
+            .a = a,
+        };
+    }
 };
 
 pub const BoundingBox = extern struct {
