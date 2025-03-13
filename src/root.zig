@@ -1067,9 +1067,14 @@ pub fn getElementData(element_id: ElementId) ?ElementData {
 /// Works during element declaration, e.g. CLAY({ .backgroundColor = Clay_Hovered() ? BLUE : RED });
 pub const isHovered = cdef.Clay_Hovered;
 
-// Bind a callback that will be called when the pointer position provided by Clay_SetPointerState is within the current element's bounding box.
-// - onHoverFunction is a function pointer to a user defined function.
-// - userData is a pointer that will be transparently passed through when the onHoverFunction is called.
+/// Bind a callback that will be called when the pointer position provided by Clay_SetPointerState is within the current element's bounding box.
+/// - onHoverFunction is a function pointer to a user defined function.
+/// - userData is a pointer that will be transparently passed through when the onHoverFunction is called.
+pub const setOnHover = cdef.Clay_OnHover;
+
+/// Bind a callback that will be called when the pointer position provided by Clay_SetPointerState is within the current element's bounding box.
+/// - onHoverFunction is a function pointer to a user defined function.
+/// - userData is a pointer that will be transparently passed through when the onHoverFunction is called.
 pub const isPointerOver = cdef.Clay_PointerOver;
 
 /// Returns data representing the state of the scrolling element with the provided ID.
