@@ -271,9 +271,11 @@ pub const ChildAlignment = extern struct {
     pub const top_left: ChildAlignment = .{};
     pub const top_center: ChildAlignment = .{ .x = .center };
     pub const top_right: ChildAlignment = .{ .x = .right };
+
     pub const center_left: ChildAlignment = .{ .y = .center };
     pub const center_center: ChildAlignment = .{ .x = .center, .y = .center };
     pub const center_right: ChildAlignment = .{ .x = .right, .y = .center };
+
     pub const bottom_left: ChildAlignment = .{ .y = .bottom };
     pub const bottom_center: ChildAlignment = .{ .x = .center, .y = .bottom };
     pub const bottom_right: ChildAlignment = .{ .x = .right, .y = .bottom };
@@ -281,6 +283,9 @@ pub const ChildAlignment = extern struct {
     pub const left_top = top_left;
     pub const left_center = center_left;
     pub const left_bottom = bottom_left;
+
+    pub const center_top = top_center;
+    pub const center_bottom = bottom_center;
 
     pub const right_top = top_right;
     pub const right_center = center_right;
