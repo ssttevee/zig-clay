@@ -409,7 +409,7 @@ pub const Padding = extern struct {
     top: u16 = 0,
     bottom: u16 = 0,
 
-    pub fn all(padding: u16) Padding {
+    pub inline fn all(padding: u16) Padding {
         return .{
             .left = padding,
             .right = padding,
@@ -418,12 +418,26 @@ pub const Padding = extern struct {
         };
     }
 
-    pub fn xy(x: u16, y: u16) Padding {
+    pub inline fn x(x_pad: u16) Padding {
         return .{
-            .left = x,
-            .right = x,
-            .top = y,
-            .bottom = y,
+            .left = x_pad,
+            .right = x_pad,
+        };
+    }
+
+    pub inline fn y(y_pad: u16) Padding {
+        return .{
+            .top = y_pad,
+            .bottom = y_pad,
+        };
+    }
+
+    pub inline fn xy(x_pad: u16, y_pad: u16) Padding {
+        return .{
+            .left = x_pad,
+            .right = x_pad,
+            .top = y_pad,
+            .bottom = y_pad,
         };
     }
 };
