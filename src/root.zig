@@ -155,17 +155,13 @@ pub const Color = extern struct {
     r: f32 = 0,
     g: f32 = 0,
     b: f32 = 0,
-    a: f32 = 255,
+    a: f32 = 0,
 
     pub const black: Color = rgb(0, 0, 0);
     pub const white: Color = rgb(255, 255, 255);
 
     pub inline fn rgb(r: f32, g: f32, b: f32) Color {
-        return .{
-            .r = r,
-            .g = g,
-            .b = b,
-        };
+        return rgba(r, g, b, 255);
     }
 
     pub inline fn rgba(r: f32, g: f32, b: f32, a: f32) Color {
