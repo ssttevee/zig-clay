@@ -122,7 +122,7 @@ pub extern fn Clay_GetElementId(id_string: clay.String) clay.ElementId;
 pub extern fn Clay_GetElementIdWithIndex(id_string: clay.String, index: u32) clay.ElementId;
 pub extern fn Clay_GetElementData(id: clay.ElementId) ElementData;
 pub extern fn Clay_Hovered() bool;
-pub extern fn Clay_OnHover(on_hover_fn: *const clay.OnHoverFn, user_data: ?*anyopaque) void;
+pub extern fn Clay_OnHover(on_hover_fn: ?*const clay.OnHoverFn, user_data: ?*anyopaque) void;
 pub extern fn Clay_PointerOver(element_id: clay.ElementId) bool;
 pub extern fn Clay_GetScrollContainerData(element_id: clay.ElementId) ScrollContainerData;
 pub extern fn Clay_SetMeasureTextFunction(measure_text_fn: *const clay.MeasureTextFn, user_data: ?*anyopaque) void;
