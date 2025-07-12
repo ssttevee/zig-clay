@@ -13,6 +13,10 @@
             .hash = "raylib_zig-5.6.0-dev-KE8REE0uBQCID3vVj1M9FUQwBSdO-KBnypo8g5LQXP8E",
             .lazy = true,
         },
+        .cairo = .{
+            .path = "../zig-cairo-bindings",
+            .lazy = true,
+        },
     },
     .paths = .{
         "build.zig",
