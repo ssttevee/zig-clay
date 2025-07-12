@@ -74,7 +74,7 @@ fn createLayout() clay.RenderCommandArray {
                     .id = .id("MainContent"),
                     .layout = .{ .layout_direction = .top_to_bottom, .padding = .all(16), .child_gap = 16, .sizing = .{ .width = .grow(.{}) } },
                     .background_color = .rgb(200, 200, 255),
-                    .scroll = .{ .vertical = true },
+                    .clip = .{ .vertical = true },
                 })({
                     clay.ui()(.{
                         .id = .id("FloatingContainer"),
@@ -112,7 +112,7 @@ fn createLayout() clay.RenderCommandArray {
             });
 
             clay.ui()(.{ .id = .id("Blob4Floating2"), .floating = .{ .attach_to = .element_with_id, .z_index = 1, .parent_id = clay.id("SidebarBlob4").id } })({
-                clay.ui()(.{ .id = .id("ScrollContainer"), .layout = .{ .sizing = .{ .height = .fixed(200) }, .child_gap = 2 }, .scroll = .{ .vertical = true } })({
+                clay.ui()(.{ .id = .id("ScrollContainer"), .layout = .{ .sizing = .{ .height = .fixed(200) }, .child_gap = 2 }, .clip = .{ .vertical = true } })({
                     clay.ui()(.{ .id = .id("FloatingContainer2"), .floating = .{ .attach_to = .parent, .z_index = 1 } })({
                         clay.ui()(.{ .id = .id("FloatingContainerInner"), .layout = .{ .sizing = .{ .width = .fixed(300), .height = .fixed(300) }, .padding = .all(16) }, .background_color = .rgba(140, 80, 200, 200) })({
                             clay.text("I'm an inline floating container.", comptime &.{ .font_size = 24, .text_color = .white });

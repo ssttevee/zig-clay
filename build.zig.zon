@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .clay = .{
-            .url = "git+https://github.com/nicbarker/clay.git#v0.13",
-            .hash = "N-V-__8AAO23UQAhH_BQUUOoxHaKW4XAbiVmGlGJO2sApBST",
+            .url = "git+https://github.com/nicbarker/clay.git#v0.14",
+            .hash = "N-V-__8AALPgZwA7tLqRlkCCL7OrkEhj4xZ3y_0FxgR42t0W",
         },
         .raylib = .{
             .url = "git+https://github.com/Not-Nik/raylib-zig.git#5d7c3e4171b3a4ea03d9a8cf18ee65fb65b03c9f",

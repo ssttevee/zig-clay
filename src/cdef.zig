@@ -9,7 +9,7 @@ pub const RenderCommand = extern struct {
         image: clay.RenderCommand.Image.RenderData,
         custom: clay.RenderCommand.Custom.RenderData,
         border: clay.RenderCommand.Border.RenderData,
-        scroll: clay.RenderCommand.ScissorStart.RenderData,
+        clip: clay.RenderCommand.ScissorStart.RenderData,
     },
     user_data: ?*anyopaque,
     id: u32,
@@ -56,7 +56,7 @@ pub const RenderCommand = extern struct {
             .scissor_start => .{
                 .scissor_start = .{
                     .bounding_box = self.bounding_box,
-                    .render_data = self.render_data.scroll,
+                    .render_data = self.render_data.clip,
                     .user_data = self.user_data,
                     .id = self.id,
                 },
@@ -82,7 +82,7 @@ pub const ScrollContainerData = extern struct {
     scroll_position: *clay.Vector2,
     scroll_container_dimensions: clay.Dimensions,
     content_dimensions: clay.Dimensions,
-    config: clay.ScrollElementConfig,
+    config: clay.ClipElementConfig,
     found: bool,
 
     pub fn toZig(self: ScrollContainerData) clay.ScrollContainerData {
@@ -109,12 +109,13 @@ pub const ElementData = extern struct {
 // Public API functions ------------------------------------------
 
 pub extern fn Clay_MinMemorySize() u32;
-pub extern fn Clay_CreateArenaWithCapacityAndMemory(capacity: u32, memory: [*]u8) clay.Arena;
+pub extern fn Clay_CreateArenaWithCapacityAndMemory(capacity: usize, memory: [*]u8) clay.Arena;
 pub extern fn Clay_SetPointerState(position: clay.Vector2, pointer_down: bool) void;
 pub extern fn Clay_Initialize(arena: clay.Arena, layout_dimensions: clay.Dimensions, error_handler: clay.ErrorHandler) *clay.Context;
 pub extern fn Clay_GetCurrentContext() *clay.Context;
 pub extern fn Clay_SetCurrentContext(context: ?*clay.Context) void;
 pub extern fn Clay_UpdateScrollContainers(enable_drag_scrolling: bool, scroll_delta: clay.Vector2, delta_time: f32) void;
+pub extern fn Clay_GetScrollOffset() clay.Vector2;
 pub extern fn Clay_SetLayoutDimensions(dimensions: clay.Dimensions) void;
 pub extern fn Clay_BeginLayout() void;
 pub extern fn Clay_EndLayout() clay.RenderCommandArray;

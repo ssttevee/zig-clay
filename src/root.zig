@@ -8,6 +8,10 @@ pub usingnamespace @import("id.zig");
 /// Clay's representation of non owning string slices, and includes
 /// a baseChars field which points to the string this slice is derived from.
 pub const String = extern struct {
+    /// Set this boolean to true if the char* data underlying this string will live for the entire lifetime of the program.
+    /// This will automatically be set for strings created with CLAY_STRING, as the macro requires a string literal.
+    is_statically_allocated: bool,
+
     len: i32,
     ptr: [*]const u8,
 
@@ -31,6 +35,7 @@ pub const String = extern struct {
 
     pub fn fromSlice(slice: []const u8) String {
         return .{
+            .is_statically_allocated = @inComptime(),
             .len = @intCast(slice.len),
             .ptr = slice.ptr,
         };
@@ -127,7 +132,7 @@ pub const Arena = extern struct {
     }
 
     pub fn initBuf(buf: []u8) Arena {
-        return cdef.Clay_CreateArenaWithCapacityAndMemory(@intCast(buf.len), buf.ptr);
+        return cdef.Clay_CreateArenaWithCapacityAndMemory(buf.len, buf.ptr);
     }
 
     pub fn deinit(self: Arena, allocator: std.mem.Allocator) void {
@@ -209,7 +214,7 @@ pub const ElementId = extern struct {
     /// A base hash value to start from, for example the parent element ID is used when calculating CLAY_ID_LOCAL().
     base_id: u32 = 0,
     /// The string id to hash.
-    string_id: String = .{ .len = 0, .ptr = undefined },
+    string_id: String = .{ .is_statically_allocated = true, .len = 0, .ptr = undefined },
 
     pub usingnamespace @import("id.zig");
 };
@@ -238,6 +243,8 @@ pub const LayoutDirection = enum(u8) {
     left_to_right,
     /// Lays out child elements from top to bottom with increasing y.
     top_to_bottom,
+
+    pub const default: LayoutDirection = .left_to_right;
 };
 
 /// Controls the alignment along the x axis (horizontal) of child elements.
@@ -248,6 +255,8 @@ pub const LayoutAlignmentX = enum(u8) {
     right,
     /// Aligns child elements horizontally to the center of this element
     center,
+
+    pub const default: LayoutAlignmentX = .left;
 };
 
 /// Controls the alignment along the y axis (vertical) of child elements.
@@ -258,6 +267,8 @@ pub const LayoutAlignmentY = enum(u8) {
     bottom,
     /// Aligns child elements vertiically to the center of this element
     center,
+
+    pub const default: LayoutAlignmentY = .top;
 };
 
 /// Controls how child elements are aligned on each axis.
@@ -465,6 +476,8 @@ pub const TextAlignment = enum(u8) {
     center,
     /// Horizontally aligns wrapped lines of text to the right hand side of their bounding box.
     right,
+
+    pub const default: TextAlignment = .left;
 };
 
 /// Controls various functionality related to text elements.
@@ -477,7 +490,11 @@ pub const TextElementConfig = extern struct {
         newlines,
         /// Disable text wrapping entirely.
         none,
+
+        pub const default: WrapMode = .words;
     };
+
+    user_data: ?*anyopaque = null,
 
     /// The RGBA color of the font to render, conventionally specified as 0-255.
     text_color: Color,
@@ -506,11 +523,12 @@ pub const TextElementConfig = extern struct {
     /// CLAY_TEXT_ALIGN_CENTER - Horizontally aligns wrapped lines of text to the center of their bounding box.
     /// CLAY_TEXT_ALIGN_RIGHT - Horizontally aligns wrapped lines of text to the right hand side of their bounding box.
     text_alignment: TextAlignment = .left,
+};
 
-    /// When set to true, clay will hash the entire text contents of this string as an identifier for its internal
-    /// text measurement cache, rather than just the pointer and length. This will incur significant performance cost for
-    /// long bodies of text.
-    hash_string_contents: bool = false,
+/// Controls various settings related to aspect ratio scaling element.
+pub const AspectRatioElementConfig = extern struct {
+    /// A float representing the target "Aspect ratio" for an element, which is its final width divided by its final height.
+    aspect_ratio: f32 = 0,
 };
 
 /// Controls various settings related to image elements.
@@ -546,6 +564,8 @@ pub const FloatingAttachPointType = enum(u8) {
     pub const bottom_left: FloatingAttachPointType = .left_bottom;
     pub const bottom_center: FloatingAttachPointType = .center_bottom;
     pub const bottom_right: FloatingAttachPointType = .right_bottom;
+
+    pub const default: PointerCaptureMode = .left_top;
 };
 
 /// Controls where a floating element is offset relative to its parent element.
@@ -572,6 +592,8 @@ pub const PointerCaptureMode = enum(u8) {
 
     /// Transparently pass through pointer events like hover and click to elements underneath the floating element.
     passthrough,
+
+    pub const default: PointerCaptureMode = .capture;
 };
 
 /// Controls which element a floating element is "attached" to (i.e. relative offset from).
@@ -584,6 +606,18 @@ pub const FloatingAttachToElement = enum(u8) {
     element_with_id,
     /// Attaches this floating element to the root of the layout, which combined with the .offset field provides functionality similar to "absolute positioning".
     attach_to_root,
+
+    pub const default: FloatingAttachToElement = .none;
+};
+
+/// Controls whether or not a floating element is clipped to the same clipping rectangle as the element it's attached to.
+pub const FloatingClipToElement = enum(u8) {
+    /// (default) - The floating element does not inherit clipping.
+    none,
+    /// The floating element is clipped to the same clipping rectangle as the element it's attached to.
+    attached_parent,
+
+    pub const default: FloatingClipToElement = .none;
 };
 
 /// Controls various settings related to "floating" elements, which are elements that "float" above other elements, potentially overlapping their boundaries,
@@ -596,6 +630,7 @@ pub const FloatingElementConfig = extern struct {
     attach_points: FloatingAttachPoints = .{},
     pointer_capture_mode: PointerCaptureMode = .capture,
     attach_to: FloatingAttachToElement = .none,
+    clip_to: FloatingClipToElement = .default,
 };
 
 /// Controls various settings related to custom elements.
@@ -607,11 +642,13 @@ pub const CustomElementConfig = extern struct {
 };
 
 /// Controls the axis on which an element switches to "scrolling", which clips the contents and allows scrolling in that direction.
-pub const ScrollElementConfig = extern struct {
-    /// Clip overflowing elements on the X axis and allow scrolling left and right.
+pub const ClipElementConfig = extern struct {
+    /// Clip overflowing elements on the X axis.
     horizontal: bool = false,
-    /// Clip overflowing elements on the YU axis and allow scrolling up and down.
+    /// Clip overflowing elements on the Y axis.
     vertical: bool = false,
+    /// Offsets the x,y positions of all child elements. Used primarily for scrolling containers.
+    child_offset: Vector2 = .{},
 };
 
 /// Controls the widths of individual element borders.
@@ -921,7 +958,7 @@ pub const ScrollContainerData = extern struct {
     /// The outer dimensions of the inner scroll container content, including the padding of the parent scroll container.
     content_dimensions: Dimensions,
     /// The config that was originally passed to the scroll element.
-    config: ScrollElementConfig,
+    config: ClipElementConfig,
 };
 
 /// Bounding box and other data for a specific UI element.
@@ -962,14 +999,16 @@ pub const ElementDeclaration = extern struct {
     background_color: Color = .{},
     /// Controls the "radius", or corner rounding of elements, including rectangles, borders and images.
     corner_radius: CornerRadius = .{},
+    /// Controls settings related to aspect ratio scaling.
+    aspect_ratio: AspectRatioElementConfig = .{},
     /// Controls settings related to image elements.
     image: ImageElementConfig = .{},
     /// Controls whether and how an element "floats", which means it layers over the top of other elements in z order, and doesn't affect the position and size of siblings or parent elements.
     floating: FloatingElementConfig = .{},
     /// Used to create CUSTOM render commands, usually to render element types not supported by Clay.
     custom: CustomElementConfig = .{},
-    /// Controls whether an element should clip its contents and allow scrolling rather than expanding to contain them.
-    scroll: ScrollElementConfig = .{},
+    /// Controls whether an element should clip its contents, as well as providing child x,y offset configuration for scrolling.
+    clip: ClipElementConfig = .{},
     /// Controls settings related to element borders, and will generate BORDER render commands.
     border: BorderElementConfig = .{},
     /// A pointer that will be transparently passed through to resulting render commands.
@@ -1067,6 +1106,11 @@ pub const setPointerState = cdef.Clay_SetPointerState;
 /// - deltaTime is the time in seconds since the last "frame" (scroll update)
 pub const updateScrollContainers = cdef.Clay_UpdateScrollContainers;
 
+/// Returns the internally stored scroll offset for the currently open element.
+///
+/// Generally intended for use with clip elements to create scrolling containers.
+pub const getScrollOffset = cdef.Clay_GetScrollOffset;
+
 /// Updates the layout dimensions in response to the window or outer container being resized.
 pub const setLayoutDimensions = cdef.Clay_SetLayoutDimensions;
 
@@ -1145,6 +1189,5 @@ pub const getMaxMeasureTextCacheWordCount = cdef.Clay_GetMaxMeasureTextCacheWord
 /// This may require reallocating additional memory, and re-calling Clay_Initialize();
 pub const setMaxMeasureTextCacheWordCount = cdef.Clay_SetMaxMeasureTextCacheWordCount;
 
-/// Resets Clay's internal text measurement cache, useful if memory to represent strings is being re-used.
-/// Similar behaviour can be achieved on an individual text element level by using Clay_TextElementConfig.hashStringContents
+/// Resets Clay's internal text measurement cache. Useful if font mappings have changed or fonts have been reloaded.
 pub const resetMeasureTextCache = cdef.Clay_ResetMeasureTextCache;
