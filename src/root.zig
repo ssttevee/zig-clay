@@ -534,6 +534,18 @@ pub const FloatingAttachPointType = enum(u8) {
     right_top,
     right_center,
     right_bottom,
+
+    pub const top_left: FloatingAttachPointType = .left_top;
+    pub const top_center: FloatingAttachPointType = .center_top;
+    pub const top_right: FloatingAttachPointType = .right_top;
+
+    pub const center_left: FloatingAttachPointType = .center_left;
+    pub const center: FloatingAttachPointType = .center_center;
+    pub const center_right: FloatingAttachPointType = .center_right;
+
+    pub const bottom_left: FloatingAttachPointType = .left_bottom;
+    pub const bottom_center: FloatingAttachPointType = .center_bottom;
+    pub const bottom_right: FloatingAttachPointType = .right_bottom;
 };
 
 /// Controls where a floating element is offset relative to its parent element.
@@ -542,6 +554,13 @@ pub const FloatingAttachPoints = extern struct {
     element: FloatingAttachPointType = .left_top,
     /// Controls the origin point on the parent element that the floating element attaches to.
     parent: FloatingAttachPointType = .left_top,
+
+    pub inline fn both(t: FloatingAttachPointType) FloatingAttachPoints {
+        return .{
+            .element = t,
+            .parent = t,
+        };
+    }
 };
 
 /// Controls how mouse pointer events like hover and click are captured or passed through to elements underneath a floating element.
