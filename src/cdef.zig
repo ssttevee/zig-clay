@@ -140,6 +140,95 @@ pub extern fn Clay_ResetMeasureTextCache() void;
 // Internal API functions required by macros ----------------------
 
 pub const internal = struct {
+    pub fn ArrayDefine(comptime T: type) type {
+        return extern struct {
+            cap: i32,
+            len: i32,
+            ptr: [*]T,
+
+            pub const Slice = extern struct {
+                len: i32,
+                ptr: [*]T,
+
+                pub fn asSlice(self: @This()) []T {
+                    return self.ptr[0..@intCast(self.len)];
+                }
+            };
+
+            pub fn asSlice(self: @This()) []T {
+                return self.ptr[0..@intCast(self.len)];
+            }
+        };
+    }
+
+    pub const SharedElementConfig = extern struct {
+        background_color: clay.Color,
+        corder_radius: clay.CornerRadius,
+        user_data: ?*anyopaque,
+    };
+
+    pub const ElementConfig = extern struct {
+        pub const Type = enum(u8) {
+            none,
+            border,
+            floating,
+            scroll,
+            image,
+            text,
+            custom,
+            shared,
+        };
+
+        pub const Union = extern union {
+            border_element_config: *clay.BorderElementConfig,
+            floating_element_config: *clay.FloatingElementConfig,
+            scroll_element_config: *clay.ScrollElementConfig,
+            image_element_config: *clay.ImageElementConfig,
+            text_element_config: *clay.TextElementConfig,
+            custom_element_config: *clay.CustomElementConfig,
+            shared_element_config: *SharedElementConfig,
+        };
+
+        pub const Array = ArrayDefine(@This());
+
+        type: Type,
+        config: Union,
+    };
+
+    pub const LayoutElementChildren = extern struct {
+        len: i32,
+        ptr: [*]u16,
+
+        pub fn asSlice(self: LayoutElementChildren) []u16 {
+            return self.ptr[0..@intCast(self.len)];
+        }
+    };
+
+    pub const WrappedTextLine = extern struct {
+        pub const Array = ArrayDefine(@This());
+
+        dimensions: clay.Dimensions,
+        line: clay.String,
+    };
+
+    pub const TextElementData = extern struct {
+        text: clay.String,
+        preferred_dimensions: clay.Dimensions,
+        element_index: i32,
+        wrapped_lines: WrappedTextLine.Array.Slice,
+    };
+
+    pub const LayoutElement = extern struct {
+        children_or_text_content: extern union {
+            children: LayoutElementChildren,
+            text_element_data: *TextElementData,
+        },
+        dimensions: clay.Dimensions,
+        min_dimensions: clay.Dimensions,
+        layout_config: *clay.LayoutConfig,
+        element_configs: ElementConfig.Array.Slice,
+    };
+
     pub extern fn Clay__OpenElement() void;
     pub extern fn Clay__ConfigureOpenElement(config: clay.ElementDeclaration) void;
     pub extern fn Clay__CloseElement() void;
@@ -147,4 +236,6 @@ pub const internal = struct {
     pub extern fn Clay__OpenTextElement(text: clay.String, text_config: *const clay.TextElementConfig) void;
     pub extern fn Clay__StoreTextElementConfig(config: clay.TextElementConfig) *clay.TextElementConfig;
     pub extern fn Clay__GetParentElementId() u32;
+    pub extern fn Clay__GetOpenLayoutElement() *LayoutElement;
+    pub extern fn Clay__GenerateIdForAnonymousElement(open_layout_element: *LayoutElement) void;
 };
